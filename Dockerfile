@@ -35,10 +35,10 @@ RUN ./configure CFLAGS="-static" --without-scsi \
 FROM scratch
 
 # Copy the smartctl binary
-COPY --from=builder /usr/local/sbin/smartctl /usr/local/sbin/smartctl
+COPY --from=builder2 /usr/local/sbin/smartctl /usr/local/sbin/smartctl
 
 # Copy the Go program binary
-COPY --from=builder2 /app/smartwatch .
+COPY --from=builder /app/smartwatch .
 
 # Command to run the executable
 CMD ["/smartwatch"]
