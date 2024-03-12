@@ -18,7 +18,7 @@ RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -installsuffix cgo -o smar
 FROM alpine:latest as builder2
 
 # Install build dependencies
-RUN apk add --no-cache alpine-sdk autoconf automake libtool
+RUN apk add --no-cache alpine-sdk autoconf automake libtool musl libgcc libstdc++
 
 # Download and unpack smartmontools
 ARG SMARTMONTOOLS_VERSION=7.2
