@@ -82,7 +82,15 @@ func loadEnvFromFile(filePath string) error {
 }
 
 func checkAndSendEmail(smtpServer, smtpPort, senderEmail, senderPassword, recipientEmail, smartctlLocation, device string) {
-	cmd := exec.Command(smartctlLocation, "-H", device)
+	var cmd *exec.Cmd
+	if strings.HasPrefix(device, "/dev/nvme") {
+		// Use the '-x' option for NVMe devices for extended information (as an example)
+		cmd = exec.Command(smartctlLocation, "-x", device)
+	} else {
+		// Use '-H' option for traditional SATA devices
+		cmd = exec.Command(smartctlLocation, "-H", device)
+	}
+
 	var out bytes.Buffer
 	cmd.Stdout = &out
 	err := cmd.Run()
@@ -91,7 +99,7 @@ func checkAndSendEmail(smtpServer, smtpPort, senderEmail, senderPassword, recipi
 		return
 	}
 
-	if strings.Contains(out.String(), "PASSED") {
+	if strings.Contains(out.String(), "PASSED") || strings.Contains(out.String(), "SMART Health Status: OK") {
 		fmt.Printf("Disk %s is healthy. No action required.\n", device)
 	} else {
 		fmt.Printf("Warning/Error found on %s. Sending email...\n", device)
